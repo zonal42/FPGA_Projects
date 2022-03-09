@@ -1,0 +1,109 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx primitives in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity HW1_4_2 is
+    Port ( clk : in  STD_LOGIC;
+           yi : in  STD_LOGIC;
+           q : out  STD_LOGIC_VECTOR (3 downto 0);
+           res : in  STD_LOGIC;
+           y2 : in  STD_LOGIC);
+end HW1_4_2;
+
+architecture Behavioral of HW1_4_2 is
+SIGNAL count: INTEGER  RANGE 0 TO 99999999;
+SIGNAL count3: INTEGER  RANGE 0 TO 499999;
+SIGNAL count2 : INTEGER  RANGE 0 TO 15:=0;
+
+SIGNAL dclk : STD_LOGIC:='0';
+SIGNAL sclk : STD_LOGIC:='0';
+SIGNAL cclk : STD_LOGIC:='0';
+SIGNAL bclk : STD_LOGIC:='0';
+begin
+process(clk)
+begin
+if(rising_edge(clk))then
+	if(yi='0')then	
+		if(count3=499999)then
+			count3<=0;
+			bclk<='1';
+		else 	
+			count3<=count3+1;
+			bclk<='0';
+		end if;
+	elsif(yi='1') then
+		if(count=99999999)then
+			count<=0;
+			cclk<='1';
+		else 	
+			count<=count+1;
+			cclk<='0';
+		end if;
+	end if;
+
+
+end if;
+
+
+END PROCESS;
+
+process(bclk,cclk,yi)
+begin
+if (yi='1') then sclk<=cclk; 
+else sclk<=bclk; 
+end if; 
+end process;
+
+process(clk)
+begin
+if(rising_edge(clk))then
+	if(rising_edge(sclk))then
+		if(res='0') then
+			count2<=0;
+		elsif(res='1') then
+				if(y2='0')then
+					if(count2=0)then
+						count2<=15;
+						
+					else
+						count2<=count2-1;
+					end if;
+				elsif(y2='1')then
+						if(count2=15)then
+							count2<=0;
+							
+						else
+							count2<=count2+1;
+						end if;
+			end if;
+		end if;
+	end if;
+end if;
+end process;
+with count2 select
+q<= "0000" when 0,
+	 "0001" when 1,
+	 "0010" when 2,
+	 "0011" when 3,
+	 "0100" when 4,
+	 "0101" when 5,
+	 "0110" when 6,
+	 "0111" when 7,
+	 "1000" when 8,
+	 "1001" when 9,
+	 "1010" when 10,
+	 "1011" when 11,
+	 "1100" when 12,
+	 "1101" when 13,
+	 "1110" when 14,
+	 "1111" when others;
+end Behavioral;
+
